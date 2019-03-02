@@ -1,0 +1,78 @@
+<html>
+<head>
+	<style>
+	body {
+		font-family: sans-serif;
+		background: #DEF;
+	}
+
+	table, th, td {
+	  border-collapse: collapse;
+	  border: 1px solid #000;
+	}
+
+	th, td {
+	  padding: 10px;
+	}
+
+	.neighbor {
+	  border: 1px solid rgb(0, 0, 0, .2);
+	  opacity: 0.85;
+	}
+
+	.neighbor-hidden {
+	  border: 1px solid rgb(0, 0, 0, 0);
+	  opacity: 0;
+	}
+
+	#wrapper {
+		position: relative;
+		width: 800px;
+		height: 600px;
+		border: 1px solid #BBB;
+		top: 50px;
+		margin: 0 auto;
+		background: #FFF;
+	}
+
+	input:focus,
+	select:focus,
+	textarea:focus,
+	button:focus {
+	    outline: none;
+	}
+
+	.white { background: #FFF; }
+	.lightGrey { background: #BBB; }
+	.darkGrey { background: #666; }
+	.black { background: #000; }
+	</style>
+</head>
+<body>
+	<div id="wrapper">
+		<!-- title -->
+		<div style="font-size:24px;width:100%;margin-top:10px;"><center>GB Tile Tool</center></div>
+		<div style="font-size:14px;width:100%;margin-top:0px;"><center>v0.1.1</center></div>
+		<!-- pixel table -->
+		<div style="position:relative;width:100%;margin-top:20px;"><center><table id="multi-pixels-table"></table></center></div>
+		<!-- tools -->
+		<div id="tools-wrapper" style="position:relative;width:100%;margin-top:20px;display:inline-block;">
+			<div id="preview-wrapper" style="float:left;width:20%;margin-left:15%;">
+				<center>Preview<br><canvas id="preview-canvas" width="48" height="48" style="border:1px solid"></canvas></center>
+			</div>
+			<div id="size-controls" style="float:left;width:20%;">
+				Artboard<br>
+				<input field="text" id="numRowTiles" style="width:20px" value="1"> rows<br>
+				<input field="text" id="numRowTiles" style="width:20px" value="1"> cols<br>
+			</div>
+			<div id="display-controls" style="float:left;width:30%;">
+				Controls<br>
+				<input type="checkbox" onclick="showGrid(this)"> Show grid<br>
+			</div>
+		</div>
+		<!-- data in/out -->
+		<div style="position:relative;width:100%;margin-top:20px;"><center><button onClick='gen2BPP()'>Generate 2BPP</button>&nbsp;<input field="text" id="2BPP" style="width:470px" value="">&nbsp;<button onClick='genTile()'>Fill from 2BPP</button></center></div></div>
+	</div>
+
+	<script src="script.js"></script>
+</body>
