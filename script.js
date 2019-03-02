@@ -3,7 +3,6 @@ pixels = [];
 numPixels = 8
 neighborPixels = 2;
 
-//generateTable('pixels-table', neighborPixels*2 + numPixels, neighborPixels*2 + numPixels);
 generateMultiTable('multi-pixels-table', 1, 3);
 //generateMini();
 
@@ -44,31 +43,38 @@ function generateMultiTable(divID, numRowTiles, numColTiles) {
   totalCols = numColTiles * 8;
   
   for (var rows=0; rows<totalRows; rows++) {
-    var arrRow = [];
+    var pixelRow = [];
     var tabRow = table.insertRow();
     for (var cells=0; cells<totalCols; cells++) {
-      var arrCell = 0;
+      var pixelCell = 0;
       var tabCell = tabRow.insertCell();
+
       tabCell.classList.add("white");
       tabCell.setAttribute("value", 0);
       tabCell.setAttribute("name", rows + "-" + cells);
-      tabCell.onclick = function () { cycleCellColor2(this); }
-      arrRow.push(arrCell);
-      borderStyle = "border-color: #aaa;";
-      if (rows == 0) {
-        borderStyle += "border-top-color: black;"
-      }
-      if (cells == 0) {
-        borderStyle += "border-left-color: black;"
-      }
-      if ((rows % 8) == 7) {
-        borderStyle += "border-bottom-color: black;"
-      }
-      if ((cells % 8) == 7) {
-        borderStyle += "border-right-color: black;"
-      }
+      tabCell.onclick = function () { cycleCellColor(this); }
+      
+      pixelRow.push(pixelCell);
+
+      borderStyle = "border-color: transparent";
+      if (document.getElementById("showGrid").checked) {
+        borderStyle = "border-color: #aaa;";
+        if (rows == 0) {
+          borderStyle += "border-top-color: black;"
+        }
+        if (cells == 0) {
+          borderStyle += "border-left-color: black;"
+        }
+        if ((rows % 8) == 7) {
+          borderStyle += "border-bottom-color: black;"
+        }
+        if ((cells % 8) == 7) {
+          borderStyle += "border-right-color: black;"
+        }
+      } 
       tabCell.setAttribute("style", borderStyle);
     }
+    pixels.push(pixelRow);
   }
 }
 
@@ -109,77 +115,15 @@ function generateMini() {
 
 function cycleCellColor(cell) {
   var cellValue = parseInt(cell.getAttribute("value"));
-  var cellRow = parseInt(cell.getAttribute("name").split("-")[0]) - neighborPixels;
-  var cellCol = parseInt(cell.getAttribute("name").split("-")[1]) - neighborPixels;
+  var cellRow = parseInt(cell.getAttribute("name").split("-")[0]);
+  var cellCol = parseInt(cell.getAttribute("name").split("-")[1]);
   
   cellValue = (cellValue + 1) % 4;
   pixels[cellRow][cellCol] = cellValue;
   cell.setAttribute("value", cellValue);
   setCellColor(cell, cellValue);
-  updateNeighbors();
-  generateMini();
+  //generateMini();
 };
-
-function cycleCellColor2(cell) {
-  var cellValue = parseInt(cell.getAttribute("value"));
-  cellValue = (cellValue + 1) % 4;
-  cell.setAttribute("value", cellValue);
-  setCellColor(cell, cellValue);
-};
-
-function updateNeighbors() {
-  table = document.getElementById('pixels-table');
-  rowStart = numPixels - neighborPixels;
-  fullHeight = numPixels + neighborPixels*2;
-  
-  // update top
-  for (var i=0; i<neighborPixels; i++) {
-    for (var j=0; j<numPixels; j++) {
-      var cell = table.rows[i].cells[neighborPixels + j];
-      setCellColor(cell, pixels[rowStart + i][j]);
-    }
-  }
-  
-  // update bottom
-  for (var i=0; i<neighborPixels; i++) { // rows
-    for (var j=0; j<numPixels; j++) { // cols
-      var cell = table.rows[neighborPixels + numPixels + i].cells[neighborPixels + j];
-      setCellColor(cell, pixels[i][j]);
-    }
-  }
-
-  // update right
-  for (var i=0; i<fullHeight; i++) {
-    for (var j=0; j<neighborPixels; j++) {
-      var cell = table.rows[i].cells[numPixels + neighborPixels + j];
-      if (table.rows[i].cells[neighborPixels + j].classList.contains("white")) {
-        setCellColor(cell, 0);
-      } else if (table.rows[i].cells[neighborPixels + j].classList.contains("lightGrey")) {
-        setCellColor(cell, 1);
-      } else if (table.rows[i].cells[neighborPixels + j].classList.contains("darkGrey")) {
-        setCellColor(cell, 2);
-      } else {
-        setCellColor(cell, 3);
-      }
-    }
-  }
-
-  // update left
-  for (var i=0; i<fullHeight; i++) {
-    for (var j=0; j<neighborPixels; j++) {
-      var cell = table.rows[i].cells[j];
-      if (table.rows[i].cells[numPixels + j].classList.contains("white")) {
-        setCellColor(cell, 0);
-      } else if (table.rows[i].cells[numPixels + j].classList.contains("lightGrey")) {
-        setCellColor(cell, 1);
-      } else if (table.rows[i].cells[numPixels + j].classList.contains("darkGrey")) {
-        setCellColor(cell, 2);
-      } else {
-        setCellColor(cell, 3);
-      }
-    }
-  }
-}
 
 function setCellColor(cell, colorValue) {
   cell.classList.remove("white", "lightGrey", "darkGrey", "black");
@@ -206,11 +150,11 @@ function gen2BPP() {
   output = document.getElementById("2BPP");
   var TBPPText = "";
   
-  for (var rows=0; rows<numPixels; rows++) {
+  for (var rows=0; rows<8; rows++) {
     leastSig = 0;
     mostSig = 0;
-    for (var cols=0; cols<numPixels; cols++) {
-      var pixelVal = pixels[rows][numPixels - cols - 1];
+    for (var cols=0; cols<8; cols++) {
+      var pixelVal = pixels[rows][7 - cols];
       switch(pixelVal) {
         case 1:
           leastSig |= 1<<cols;
@@ -234,7 +178,7 @@ function gen2BPP() {
 
 function genTile() {
   input = document.getElementById("2BPP");
-  table = document.getElementById("pixels-table");
+  table = document.getElementById("multi-pixels-table");
 
   var TBPPText = input.value;
 
@@ -254,32 +198,24 @@ function genTile() {
     }
 
     // redraw cells
-    for (var i=2; i<10; i++) {
-      for (var j=2; j<10; j++) {
+    for (var i=0; i<8; i++) {
+      for (var j=0; j<8; j++) {
         var cell = table.rows[i].cells[j];
-        var newCellVal = pixels[i-2][j-2];
+        var newCellVal = pixels[i][j];
         setCellColor(cell, newCellVal);
         cell.setAttribute("value", newCellVal);
       }
     }
 
     // redraw mini
-    generateMini();
+    //generateMini();
   }
 }
 
-function showNeighbors(checkbox) {
+function showGrid(checkbox) {
     if (checkbox.checked) {
-        var neighbors = document.getElementsByClassName("neighbor");
-        while(neighbors.length > 0) {
-        	neighbors[0].classList.add("neighbor-hidden");
-        	neighbors[0].classList.remove("neighbor");
-        }
+
     } else {
-    	var neighbors = document.getElementsByClassName("neighbor-hidden");
-        while(neighbors.length > 0) {
-        	neighbors[0].classList.add("neighbor");
-        	neighbors[0].classList.remove("neighbor-hidden");
-        }
+
     }
 }
