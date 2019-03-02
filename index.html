@@ -1,0 +1,56 @@
+<html>
+<head>
+	<style>
+	body {
+		font-family: sans-serif;
+		background: #DEF;
+	}
+
+	table, th, td {
+	  border-collapse: collapse;
+	  border: 1px solid #000;
+	}
+
+	th, td {
+	  padding: 10px;
+	}
+
+	.neighbor {
+	  border: 1px solid rgb(0, 0, 0, .2);
+	  opacity: 0.85;
+	}
+
+	.neighbor-hidden {
+	  border: 1px solid rgb(0, 0, 0, 0);
+	  opacity: 0;
+	}
+
+	#wrapper {
+		position: relative;
+		width: 800px;
+		height: 360px;
+		border: 1px solid #BBB;
+		top: 50px;
+		margin: 0 auto;
+		background: #FFF;
+	}
+
+	.white { background: #FFF; }
+	.lightGrey { background: #BBB; }
+	.darkGrey { background: #666; }
+	.black { background: #000; }
+	</style>
+</head>
+<body>
+	<div id="wrapper">
+		<div style="font-size:24px;width:100%;margin-top:10px;"><center>GB Tile Tool</center></div>
+		<div style="font-size:14px;width:100%;margin-top:0px;"><center>v0.1</center></div>
+		<div style="position:absolute;top:80px;left:20px;"><table id="pixels-table"></table></div>
+		<div style="position:absolute;top:80px;left:300px;">Preview (3x3 tiles)<br><canvas id="preview-canvas" width="48" height="48" style="border:1px solid"></canvas></div>
+		<div id="controls" style="position:absolute;top:200px;left:300px;"><input type="checkbox" onclick="showNeighbors(this)"> Show neighbor pixels</div>
+		<div style="position:absolute; top:250px;left:300px;"><button onClick='gen2BPP()'>Generate 2BPP</button>&nbsp;<button onClick='genTile()'>Fill Tile from 2BPP</button><br><br>
+		<input field="text" id="2BPP" style="width:470px" value=""></div></div>
+	</div>
+
+	<script src="script.js"></script>
+</body>
