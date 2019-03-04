@@ -1,80 +1,81 @@
-pixels = [];
+/** defines/inits **/
 
-numPixels = 8
-neighborPixels = 2;
+// max dimensions
+var MAXROW = 2;
+var MAXCOL = 3;
 
-generateMultiTable('multi-pixels-table', 1, 3);
+// generate pixel array (2 rows x 3 cols)
+pixels = generatePixelArray(MAXROW, MAXCOL);
+
+// create pixel artboard
+var numRowTiles = document.getElementById("numRowTiles").value;
+var numColTiles = document.getElementById("numColTiles").value
+generateArtboard('multi-pixels-table', numRowTiles, numColTiles);
+
 //generateMini();
 
-function generateTable(divID, numRows, numCols) {
-  table = document.getElementById(divID);
-  
-  for (var rows=0; rows<numRows; rows++) {
-    var arrRow = [];
-    var tabRow = table.insertRow();
-    for (var cells=0; cells<numCols; cells++) {
-      var arrCell = 0;
-      var tabCell = tabRow.insertCell();
-      if ((rows >= neighborPixels) && (rows < (neighborPixels + numPixels)) && (cells >= neighborPixels) && (cells < (neighborPixels + numPixels))) {
-        tabCell.classList.add("white");
-        tabCell.setAttribute("value", 0);
-        tabCell.setAttribute("name", rows + "-" + cells);
-        tabCell.onclick = function () { cycleCellColor(this); }
-        arrRow.push(arrCell);
-      } else {
-        if ((rows == (neighborPixels - 1)) && (cells >= neighborPixels) && (cells < (neighborPixels + numPixels))) {
-          tabCell.setAttribute("style", "border-bottom-color: black;")
-        } else if ((cells == (neighborPixels - 1)) && (rows >= neighborPixels) && (rows < (neighborPixels + numPixels))) {
-          tabCell.setAttribute("style", "border-right-color: black;")
-        }
-        tabCell.classList.add("neighbor");
-      }
+// set up listeners for artboard dimension change
+document.addEventListener('DOMContentLoaded',function() {
+    document.querySelector('input[name="numRowTiles"]').onchange=updateArtboard;
+},false);
+
+document.addEventListener('DOMContentLoaded',function() {
+    document.querySelector('input[name="numColTiles"]').onchange=updateArtboard;
+},false);
+
+/** functions **/
+
+function generatePixelArray(rowTiles, colTiles) {
+  var rows = rowTiles * 8;
+  var cols = colTiles * 8;
+  var newPixelArray = [];
+
+  for (var row=0; row<rows; row++) {
+    newRowArray = [];
+    for (var col=0; col<cols; col++) {
+      newRowArray.push(0);
     }
-    if ((rows >= neighborPixels) && (rows < (neighborPixels + numPixels))){
-      pixels.push(arrRow);
-    }
+    newPixelArray.push(newRowArray);
   }
+  return newPixelArray;
 }
 
-function generateMultiTable(divID, numRowTiles, numColTiles) {
+function generateArtboard(divID, numRowTiles, numColTiles) {
   table = document.getElementById(divID);
   
   totalRows = numRowTiles * 8;
   totalCols = numColTiles * 8;
   
-  for (var rows=0; rows<totalRows; rows++) {
-    var pixelRow = [];
+  for (var row=0; row<totalRows; row++) {
+    var pixelRow = pixels[row];
     var tabRow = table.insertRow();
-    for (var cells=0; cells<totalCols; cells++) {
+    for (var col=0; col<totalCols; col++) {
       var pixelCell = 0;
       var tabCell = tabRow.insertCell();
 
-      tabCell.classList.add("white");
-      tabCell.setAttribute("value", 0);
-      tabCell.setAttribute("name", rows + "-" + cells);
+      setCellColor(tabCell, pixelRow[col]);
+      tabCell.setAttribute("value", pixelRow[col]);
+      tabCell.setAttribute("name", row + "-" + col);
       tabCell.onclick = function () { cycleCellColor(this); }
-      
-      pixelRow.push(pixelCell);
 
       borderStyle = "border-color: transparent";
       if (document.getElementById("showGrid").checked) {
         borderStyle = "border-color: #aaa;";
-        if (rows == 0) {
+        if (row == 0) {
           borderStyle += "border-top-color: black;"
         }
-        if (cells == 0) {
+        if (col == 0) {
           borderStyle += "border-left-color: black;"
         }
-        if ((rows % 8) == 7) {
+        if ((row % 8) == 7) {
           borderStyle += "border-bottom-color: black;"
         }
-        if ((cells % 8) == 7) {
+        if ((col % 8) == 7) {
           borderStyle += "border-right-color: black;"
         }
       } 
       tabCell.setAttribute("style", borderStyle);
     }
-    pixels.push(pixelRow);
   }
 }
 
@@ -113,18 +114,6 @@ function generateMini() {
   ctx.stroke();
 }
 
-function cycleCellColor(cell) {
-  var cellValue = parseInt(cell.getAttribute("value"));
-  var cellRow = parseInt(cell.getAttribute("name").split("-")[0]);
-  var cellCol = parseInt(cell.getAttribute("name").split("-")[1]);
-  
-  cellValue = (cellValue + 1) % 4;
-  pixels[cellRow][cellCol] = cellValue;
-  cell.setAttribute("value", cellValue);
-  setCellColor(cell, cellValue);
-  //generateMini();
-};
-
 function setCellColor(cell, colorValue) {
   cell.classList.remove("white", "lightGrey", "darkGrey", "black");
   switch(colorValue) {
@@ -145,6 +134,18 @@ function setCellColor(cell, colorValue) {
       break;
   }
 }
+
+function cycleCellColor(cell) {
+  var cellValue = parseInt(cell.getAttribute("value"));
+  var cellRow = parseInt(cell.getAttribute("name").split("-")[0]);
+  var cellCol = parseInt(cell.getAttribute("name").split("-")[1]);
+  
+  cellValue = (cellValue + 1) % 4;
+  pixels[cellRow][cellCol] = cellValue;
+  cell.setAttribute("value", cellValue);
+  setCellColor(cell, cellValue);
+  //generateMini();
+};
 
 function gen2BPP() {
   output = document.getElementById("2BPP");
@@ -176,6 +177,7 @@ function gen2BPP() {
   output.value = TBPPText;
 }
 
+// only generates for top left tile right now
 function genTile() {
   input = document.getElementById("2BPP");
   table = document.getElementById("multi-pixels-table");
@@ -183,18 +185,18 @@ function genTile() {
   var TBPPText = input.value;
 
   if (TBPPText != "") {
-    // update pixels array
-    pixels = [];
+    // parse input
     TBPPVals = TBPPText.substring(1).split(", $");
-    for (var i=0; i<TBPPVals.length; i+=2) {
+    var numBytes = Math.floor(TBPPVals.length/2)*2; // make sure even
+    // update pixels array
+    for (var i=0; i<numBytes; i+=2) {
       var leastSig = parseInt(TBPPVals[i], 16);
       var mostSig = parseInt(TBPPVals[i + 1], 16);
-      var newRow = []
+      var row = pixels[i/2];
       for (var j=7; j>=0; j--) {
         var pixelVal = (((mostSig>>j)&0x1)<<1) + ((leastSig>>j)&0x1);
-        newRow.push(pixelVal);
+        row[7-j] = pixelVal;
       }
-      pixels.push(newRow);
     }
 
     // redraw cells
@@ -213,9 +215,62 @@ function genTile() {
 }
 
 function showGrid(checkbox) {
-    if (checkbox.checked) {
+  var table = document.getElementById("multi-pixels-table");
+  var rows = table.rows.length;
+  var cols = table.rows[0].cells.length;
 
-    } else {
-
+  if (checkbox.checked) {
+    for (var row=0; row<rows; row++) {
+      for (var col=0; col<cols; col++) {
+        borderStyle = "border-color: #aaa;";
+        if (row == 0) {
+          borderStyle += "border-top-color: black;"
+        }
+        if (col == 0) {
+          borderStyle += "border-left-color: black;"
+        }
+        if ((row % 8) == 7) {
+          borderStyle += "border-bottom-color: black;"
+        }
+        if ((col % 8) == 7) {
+          borderStyle += "border-right-color: black;"
+        }
+        table.rows[row].cells[col].setAttribute("style", borderStyle);
+      }
     }
+  } else {
+    for (var row=0; row<rows; row++) {
+      for (var col=0; col<cols; col++) {
+        borderStyle = "border-color: transparent;";
+        table.rows[row].cells[col].setAttribute("style", borderStyle);
+      }
+    }
+  }
+}
+
+function copy2BPPText() {
+  var TBPPText = document.getElementById("2BPP");
+  TBPPText.select();
+  document.execCommand("copy");
+}
+
+function updateArtboard(e) {
+  // get new dimensions
+  var numRowTiles = document.getElementById("numRowTiles").value;
+  var numColTiles = document.getElementById("numColTiles").value;
+
+  // make sure new dimensions are within acceptable size
+  if (numRowTiles < 1) { numRowTiles = 1; }
+  else if (numRowTiles > MAXROW) { numRowTiles = MAXROW; }
+  document.getElementById("numRowTiles").value = numRowTiles;
+
+  if (numColTiles < 1) { numColTiles = 1; }
+  else if (numColTiles > MAXROW) { numColTiles = MAXROW; }
+  document.getElementById("numColTiles").value = numColTiles;
+
+  // clear table
+  document.getElementById("multi-pixels-table").innerHTML = "";
+
+  // generate updated table
+  generateArtboard('multi-pixels-table', numRowTiles, numColTiles);
 }

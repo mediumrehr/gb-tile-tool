@@ -35,6 +35,11 @@
 		background: #FFF;
 	}
 
+	a {
+		text-decoration: none;
+		color: #33a;
+	}
+
 	input:focus,
 	select:focus,
 	textarea:focus,
@@ -56,8 +61,8 @@
 		<!-- table size -->
 		<div id="size-controls" style="position:relative;margin-top:20px;">
 			Artboard<br>
-			<input field="text" id="numRowTiles" style="width:20px" value="1"> rows<br>
-			<input field="text" id="numRowTiles" style="width:20px" value="1"> cols<br>
+			<input field="text" id="numRowTiles" name="numRowTiles" style="width:20px" value="1"> rows<br>
+			<input field="text" id="numColTiles" name="numColTiles" style="width:20px" value="1"> cols<br>
 		</div>
 		<!-- controls -->
 		<div id="display-controls" style="position:relative;margin-top:20px;">
@@ -73,7 +78,12 @@
 			<center>Preview<br><canvas id="preview-canvas" width="48" height="48" style="border:1px solid"></canvas></center>
 		</div>
 		<!-- data in/out -->
-		<div style="position:relative;width:100%;margin-top:20px;"><center><button onClick='gen2BPP()'>Generate 2BPP</button>&nbsp;<input field="text" id="2BPP" style="width:470px" value="">&nbsp;<button onClick='genTile()'>Fill from 2BPP</button></center></div></div>
+		<div style="position:relative;width:100%;margin-top:20px;">
+			<center>
+				<button onClick="gen2BPP()" style="display:inline-block;">Generate 2BPP</button><div style="width:20px;display:inline-block;"></div><button onClick="genTile()" style="display:inline-block;">Fill from 2BPP</button><br><br>
+				<input field="text" id="2BPP" style="width:450px" value="">&nbsp;<button onclick="copy2BPPText()">Copy</button>
+			</center>
+		</div>
 	</dir>
 
 	<script src="script.js"></script>
