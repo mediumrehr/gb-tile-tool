@@ -5,7 +5,11 @@ var MAXROW = 2;
 var MAXCOL = 3;
 
 // generate pixel array (2 rows x 3 cols)
-pixels = generatePixelArray(MAXROW, MAXCOL);
+var pixels = generatePixelArray(MAXROW, MAXCOL);
+
+// 0: cycle; 1: paint selected color
+var paintMode = 0;
+var paintColor = 0;
 
 // create pixel artboard
 var numRowTiles = document.getElementById("numRowTiles").value;
@@ -15,13 +19,13 @@ generateArtboard('multi-pixels-table', numRowTiles, numColTiles);
 //generateMini();
 
 // set up listeners for artboard dimension change
-document.addEventListener('DOMContentLoaded',function() {
-    document.querySelector('input[name="numRowTiles"]').onchange=updateArtboard;
-},false);
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelector('input[name="numRowTiles"]').onchange=updateArtboard;
+}, false);
 
-document.addEventListener('DOMContentLoaded',function() {
-    document.querySelector('input[name="numColTiles"]').onchange=updateArtboard;
-},false);
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelector('input[name="numColTiles"]').onchange=updateArtboard;
+}, false);
 
 /** functions **/
 
@@ -56,7 +60,7 @@ function generateArtboard(divID, numRowTiles, numColTiles) {
       setCellColor(tabCell, pixelRow[col]);
       tabCell.setAttribute("value", pixelRow[col]);
       tabCell.setAttribute("name", row + "-" + col);
-      tabCell.onclick = function () { cycleCellColor(this); }
+      tabCell.onclick = function () { changeCellColor(this); }
 
       borderStyle = "border-color: transparent";
       if (document.getElementById("showGrid").checked) {
@@ -135,6 +139,20 @@ function setCellColor(cell, colorValue) {
   }
 }
 
+function changeCellColor(cell) {
+  switch(paintMode) {
+    case 0: // cycle
+      cycleCellColor(cell);
+      break;
+    case 1:
+      paintCellColor(cell);
+      break;
+
+    default:
+      break;
+  }
+}
+
 function cycleCellColor(cell) {
   var cellValue = parseInt(cell.getAttribute("value"));
   var cellRow = parseInt(cell.getAttribute("name").split("-")[0]);
@@ -146,6 +164,16 @@ function cycleCellColor(cell) {
   setCellColor(cell, cellValue);
   //generateMini();
 };
+
+function paintCellColor(cell) {
+  var cellRow = parseInt(cell.getAttribute("name").split("-")[0]);
+  var cellCol = parseInt(cell.getAttribute("name").split("-")[1]);
+  
+  pixels[cellRow][cellCol] = paintColor;
+  cell.setAttribute("value", paintColor);
+  setCellColor(cell, paintColor);
+  //generateMini();
+}
 
 function gen2BPP() {
   output = document.getElementById("2BPP");
@@ -265,7 +293,7 @@ function updateArtboard(e) {
   document.getElementById("numRowTiles").value = numRowTiles;
 
   if (numColTiles < 1) { numColTiles = 1; }
-  else if (numColTiles > MAXROW) { numColTiles = MAXROW; }
+  else if (numColTiles > MAXCOL) { numColTiles = MAXCOL; }
   document.getElementById("numColTiles").value = numColTiles;
 
   // clear table
@@ -273,4 +301,39 @@ function updateArtboard(e) {
 
   // generate updated table
   generateArtboard('multi-pixels-table', numRowTiles, numColTiles);
+}
+
+function changeColor(colorSquare) {
+  var colorSquares = document.getElementsByClassName("color-square");
+  switch(colorSquare.id) {
+    case "white-color":
+      paintColor = 0;
+      break;
+
+    case "lightGrey-color":
+      paintColor = 1;
+      break;
+
+    case "darkGrey-color":
+      paintColor = 2;
+      break;
+
+    case "black-color":
+      paintColor = 3;
+      break;
+
+    default:
+      paintColor = 0;
+      break;
+  }
+
+  for (var i=0; i<colorSquares.length; i++) {
+    colorSquares[i].classList.remove("selected");
+  }
+
+  colorSquare.classList.add("selected");
+}
+
+function updatePaintMode(radioButton) {
+  paintMode = parseInt(radioButton.value);
 }

@@ -47,6 +47,21 @@
 	    outline: none;
 	}
 
+	.color-square {
+		width: 20px;
+		height: 20px;
+		display: inline-block;
+		border: 1px solid transparent;
+	}
+
+	.selectable {
+		cursor: pointer;
+	}
+
+	.selected {
+		border: 1px solid #f80;
+	}
+
 	.white { background: #FFF; }
 	.lightGrey { background: #BBB; }
 	.darkGrey { background: #666; }
@@ -57,10 +72,10 @@
 	<div id="controls" style="float:left;width:200px;margin-left:20px;margin-top:30px;">
 		<!-- title -->
 		<div style="font-size:24px;width:100%;"><center>GB Tile Tool</center></div>
-		<div style="font-size:14px;width:100%;"><center>by <a href="https://www.twitter.com/mediumrehr">mediumrehr</a><br>v0.1.2</center></div>
+		<div style="font-size:14px;width:100%;"><center>by <a href="https://www.twitter.com/mediumrehr">mediumrehr</a><br>v0.2</center></div>
 		<!-- table size -->
 		<div id="size-controls" style="position:relative;margin-top:20px;">
-			Artboard<br>
+			Tile Layout<br>
 			<input field="text" id="numRowTiles" name="numRowTiles" style="width:20px" value="1"> rows<br>
 			<input field="text" id="numColTiles" name="numColTiles" style="width:20px" value="1"> cols<br>
 		</div>
@@ -68,6 +83,18 @@
 		<div id="display-controls" style="position:relative;margin-top:20px;">
 			Controls<br>
 			<input type="checkbox" id="showGrid" checked="true" onclick="showGrid(this)"> Show grid<br>
+		</div>
+		<div style="position:relative;margin-top:20px">
+			Paint Mode<br>
+			<form>
+				<input type="radio" id="paint-cycle" name="paint-mode" onclick="updatePaintMode(this)" value="0" checked>cycle<br>
+				<input type="radio" id="paint-select" name="paint-mode" onclick="updatePaintMode(this)" value="1">select
+			</form>
+			<!-- <div id="mode-cycle" class="selectable selected" style="display:inline-block;">cycle</div> <div id="mode-select" class="selectable" style="display:inline-block;">select</div><br> -->
+			<div id="white-color" class="color-square selectable white selected" onclick="changeColor(this)"></div>
+			<div id="lightGrey-color" class="color-square selectable lightGrey" onclick="changeColor(this)"></div>
+			<div id="darkGrey-color" class="color-square selectable darkGrey" onclick="changeColor(this)"></div>
+			<div id="black-color" class="color-square selectable black" onclick="changeColor(this)"></div>
 		</div>
 	</div>
 	<dir id="editor" style="float:left;min-width:600px;margin-top:30px;">
