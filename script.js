@@ -1,3 +1,16 @@
+/** notes **/
+/*
+  todo:
+  1. fix preview
+  2. figure out how to print multiple tile codes <-- working on
+    i. add indexes [done]
+    ii. fix grid toggling
+    iii. add tile selector
+  3. make it look better
+  4. settings saving
+  5. tile saving
+*/
+
 /** defines/inits **/
 
 // max dimensions
@@ -46,6 +59,61 @@ function generatePixelArray(rowTiles, colTiles) {
 
 function generateArtboard(divID, numRowTiles, numColTiles) {
   table = document.getElementById(divID);
+  table.setAttribute("style", "border:none;");
+  
+  // first row is headers
+  var topRow = table.insertRow();
+  var blankCell = topRow.insertCell(); // blank
+  blankCell.setAttribute("style", "border:none;");
+  for (var col=0; col<numColTiles; col++) {
+    var colHeader = topRow.insertCell();
+    colHeader.setAttribute("style", "border:none;");
+    colHeader.style.textAlign = "center";
+    colHeader.innerHTML = String.fromCharCode(65 + col);
+  }
+
+  // navigate display table
+  for (var row=0; row<numRowTiles; row++) {
+    var newRow = table.insertRow();
+    var rowHeader = newRow.insertCell();
+    rowHeader.setAttribute("style", "border:none;");
+    rowHeader.innerHTML = row;
+
+    for (var col=0; col<numColTiles; col++) {
+      var newTile = newRow.insertCell();
+      newTile.setAttribute("style", "padding:0;border:none;");
+      // instance new tile and add it to the display table
+      var newTileTable = document.createElement('table');
+      newTileTable.setAttribute("id", "myTable");
+      newTile.appendChild(newTileTable);
+
+      // generate tile
+      for (var tileRow=0; tileRow<8; tileRow++) {
+        var rowStart = row*8;
+        var newTileRow = newTileTable.insertRow();
+
+        for (var tileCol=0; tileCol<8; tileCol++) {
+          var colStart = col*8;
+          var tileVal = pixels[rowStart + tileRow][colStart + tileCol];
+
+          var newTileCol = newTileRow.insertCell();
+          setCellColor(newTileCol, tileVal);
+          newTileCol.setAttribute("value", tileVal);
+          newTileCol.setAttribute("name", (rowStart + tileRow) + "-" + (colStart + tileCol));
+          newTileCol.onclick = function () { changeCellColor(this); }
+        }
+      }
+    }
+    // a little padding on the right side so things aren't off-center
+    var paddingCell = newRow.insertCell();
+    paddingCell.setAttribute("style", "border:none;opacity:0;");
+    paddingCell.innerHTML = row;
+  }
+}
+
+/*
+function generateArtboard(divID, numRowTiles, numColTiles) {
+  table = document.getElementById(divID);
   
   totalRows = numRowTiles * 8;
   totalCols = numColTiles * 8;
@@ -82,6 +150,7 @@ function generateArtboard(divID, numRowTiles, numColTiles) {
     }
   }
 }
+*/
 
 function generateMini() {
   var c = document.getElementById("preview-canvas");
@@ -175,6 +244,7 @@ function paintCellColor(cell) {
   //generateMini();
 }
 
+// only generates for top left tile right now
 function gen2BPP() {
   output = document.getElementById("2BPP");
   var TBPPText = "";
@@ -216,6 +286,9 @@ function genTile() {
     // parse input
     TBPPVals = TBPPText.substring(1).split(", $");
     var numBytes = Math.floor(TBPPVals.length/2)*2; // make sure even
+    if (numBytes > 16) {
+      numBytes = 16;
+    }
     // update pixels array
     for (var i=0; i<numBytes; i+=2) {
       var leastSig = parseInt(TBPPVals[i], 16);
@@ -228,9 +301,12 @@ function genTile() {
     }
 
     // redraw cells
+    var dispRow = 1; // row of display table
+    var dispCol = 1; // column of display table
+    var tile = table.rows[dispRow].cells[dispCol].children[0];
     for (var i=0; i<8; i++) {
       for (var j=0; j<8; j++) {
-        var cell = table.rows[i].cells[j];
+        var cell = tile.rows[i].cells[j];
         var newCellVal = pixels[i][j];
         setCellColor(cell, newCellVal);
         cell.setAttribute("value", newCellVal);

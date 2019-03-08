@@ -15,26 +15,6 @@
 	  padding: 10px;
 	}
 
-	.neighbor {
-	  border: 1px solid rgb(0, 0, 0, .2);
-	  opacity: 0.85;
-	}
-
-	.neighbor-hidden {
-	  border: 1px solid rgb(0, 0, 0, 0);
-	  opacity: 0;
-	}
-
-	#wrapper {
-		position: relative;
-		width: 800px;
-		height: 600px;
-		border: 1px solid #BBB;
-		top: 50px;
-		margin: 0 auto;
-		background: #FFF;
-	}
-
 	a {
 		text-decoration: none;
 		color: #33a;
@@ -82,7 +62,7 @@
 		<!-- controls -->
 		<div id="display-controls" style="position:relative;margin-top:20px;">
 			Controls<br>
-			<input type="checkbox" id="showGrid" checked="true" onclick="showGrid(this)"> Show grid<br>
+			<input type="checkbox" id="showGrid" checked="true" onclick="showGrid(this)" disabled="true"> Show grid<br>
 		</div>
 		<div style="position:relative;margin-top:20px">
 			Paint Mode<br>
